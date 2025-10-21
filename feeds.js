@@ -1,5 +1,3 @@
 export const RSS_FEEDS = [
-  "https://example.com/feed.xml",
-  "https://another.com/rss.xml",
-  // Add more here
+  "https://cprss.s3.amazonaws.com/javascriptweekly.com.xml",
 ];
