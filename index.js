@@ -64,19 +64,26 @@ async function postToDiscord(newItems) {
     return;
   }
 
-  const content =
+  const message =
     "📰 **New RSS items added to Raindrop.io!**\n\n" +
     newItems
-      .map((i) => `• [${i.title}](${i.link}) (${i.feedTitle})`)
+      .slice(0, 10)
+      .map((i) => `• [${i.title}](${i.link})`)
       .join("\n");
+
+  const payload = { content: message };
 
   const res = await fetch(DISCORD_WEBHOOK, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify(payload),
   });
 
-  if (!res.ok) console.error(`❌ Discord webhook failed: ${res.status}`);
+  if (!res.ok) {
+    console.error(`❌ Discord webhook failed: ${res.status}`);
+  } else {
+    console.log("✅ Posted update to Discord!");
+  }
 }
 
 async function processFeed(url) {
