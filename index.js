@@ -119,4 +119,4 @@ async function main() {
   console.log("\n✨ Done.");
 }
 
-main();
+await main();
