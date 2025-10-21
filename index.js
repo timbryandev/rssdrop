@@ -10,6 +10,10 @@ const COLLECTION_ID = process.env.RAINDROP_COLLECTION_ID;
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 const HOURS_BACK = Number(process.env.HOURS_BACK || 6);
 
+function sleep(ms) {
+  return new Promise((res) => setTimeout(res, ms));
+}
+
 async function fetchFeedWithRetry(url, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
