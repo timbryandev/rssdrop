@@ -10,6 +10,22 @@ const COLLECTION_ID = process.env.RAINDROP_COLLECTION_ID;
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 const HOURS_BACK = Number(process.env.HOURS_BACK || 6);
 
+async function fetchFeedWithRetry(url, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await parser.parseURL(url);
+    } catch (err) {
+      if (err.message.includes("429") && i < retries - 1) {
+        const delay = 5000 * (i + 1);
+        console.warn(`⚠️ Rate limited, retrying in ${delay / 1000}s...`);
+        await sleep(delay);
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
 async function addToRaindrop(item) {
   const response = await fetch("https://api.raindrop.io/rest/v1/raindrop", {
     method: "POST",
@@ -61,7 +77,7 @@ async function postToDiscord(newItems) {
 
 async function processFeed(url) {
   console.log(`\n🔗 Checking feed: ${url}`);
-  const feed = await parser.parseURL(url);
+  const feed = await fetchFeedWithRetry(url);
 
   const recentItems = feed.items.filter((i) =>
     isNewerThanHoursAgo(i.pubDate, HOURS_BACK)
