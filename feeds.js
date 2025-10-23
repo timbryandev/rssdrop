@@ -12,5 +12,6 @@ export const RSS_FEEDS = [
   "https://engineering.fb.com/feed/",
   "https://www.echojs.com/rss",
   "https://frontenddogma.com/feed/",
+  "https://hungrymindsdev.substack.com/feed",
   "https://tldr.tech/api/rss/tech",
 ];
