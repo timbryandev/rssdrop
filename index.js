@@ -2,13 +2,23 @@ import Parser from "rss-parser";
 import fetch from "node-fetch";
 import { RSS_FEEDS } from "./feeds.js";
 
-const parser = new Parser();
-
-// --- Config ---
 const RAINDROP_TOKEN = process.env.RAINDROP_TOKEN;
 const COLLECTION_ID = process.env.RAINDROP_COLLECTION_ID;
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 const HOURS_BACK = Number(process.env.HOURS_BACK || 6);
+
+const parser = new Parser({
+  customFetch: async (url, options = {}) =>
+    fetch(url, {
+      ...options,
+      headers: {
+        "User-Agent":
+          "rssdrop-bot/1.0 (+https://github.com/timbryandev/rssdrop)",
+        "Accept": "application/rss+xml, application/xml, text/xml",
+        ...options.headers,
+      },
+    }),
+});
 
 function sleep(ms) {
   return new Promise((res) => setTimeout(res, ms));
@@ -19,6 +29,10 @@ async function fetchFeedWithRetry(url, retries = 3) {
     try {
       return await parser.parseURL(url);
     } catch (err) {
+      if (err.message.includes("403")) {
+        console.warn(`🚫 403 Forbidden for ${url} — skipping.`);
+        return { items: [] }; // Gracefully skip this feed
+      }
       if (err.message.includes("429") && i < retries - 1) {
         const delay = 5000 * (i + 1);
         console.warn(`⚠️ Rate limited, retrying in ${delay / 1000}s...`);
