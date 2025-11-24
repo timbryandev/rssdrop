@@ -30,15 +30,17 @@ async function fetchFeedWithRetry(url, retries = 3) {
       return await parser.parseURL(url);
     } catch (err) {
       if (err.message.includes("403")) {
-        console.warn(`🚫 403 Forbidden for ${url} — skipping.`);
+        console.warn(`::warning 403 Forbidden for ${url} — skipping.`);
         return { items: [] }; // Gracefully skip this feed
       }
       if (err.message.includes("429") && i < retries - 1) {
         const delay = 5000 * (i + 1);
-        console.warn(`⚠️ Rate limited, retrying in ${delay / 1000}s...`);
+        console.warn(`::warning Rate limited "${URL}", retrying in ${delay / 1000}s... (attempt ${i+1}/${retries})`);
         await sleep(delay);
       } else {
-        throw err;
+        console.log(`::error Could not read feed for "${url}"`);
+        console.error(err);
+        return { items: [] }; // Gracefully skip this feed
       }
     }
   }
