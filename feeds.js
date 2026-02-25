@@ -3,7 +3,7 @@ export const RSS_FEEDS = [
   "https://cprss.s3.amazonaws.com/javascriptweekly.com.xml",
   "https://overreacted.io/rss.xml",
   // "https://hackernoon.com/tagged/programming/feed", // I'm getting a lot of articles I'm not interested in atm, generating lot's of noise in my feed
-  "https://css-tricks.com/feed/",
+  // "https://css-tricks.com/feed/", // TODO feed format has changed and breaking CI
   "https://web.dev/static/blog/feed.xml",
   "https://frontendmasters.com/blog/feed/",
   "https://kentcdodds.com/blog/rss.xml",
