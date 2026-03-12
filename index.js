@@ -1,11 +1,16 @@
 import Parser from "rss-parser";
-import fetch from "node-fetch";
 import { RSS_FEEDS } from "./feeds.js";
 
 const RAINDROP_TOKEN = process.env.RAINDROP_TOKEN;
 const COLLECTION_ID = process.env.RAINDROP_COLLECTION_ID;
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK;
 const HOURS_BACK = Number(process.env.HOURS_BACK || 6);
+const MAX_DISCORD_ITEMS = 10;
+
+if (!RAINDROP_TOKEN || !COLLECTION_ID) {
+  console.error("❌ Missing required environment variables: RAINDROP_TOKEN and/or RAINDROP_COLLECTION_ID.");
+  process.exit(1);
+}
 
 const parser = new Parser({
   customFetch: async (url, options = {}) =>
@@ -35,7 +40,7 @@ async function fetchFeedWithRetry(url, retries = 3) {
       }
       if (err.message.includes("429") && i < retries - 1) {
         const delay = 5000 * (i + 1);
-        console.warn(`::warning Rate limited "${URL}", retrying in ${delay / 1000}s... (attempt ${i+1}/${retries})`);
+        console.warn(`::warning Rate limited "${url}", retrying in ${delay / 1000}s... (attempt ${i+1}/${retries})`);
         await sleep(delay);
       } else {
         console.log(`::error Could not read feed for "${url}"`);
@@ -80,12 +85,13 @@ async function postToDiscord(newItems) {
     return;
   }
 
+  const totalCount = newItems.length;
+  const displayItems = newItems.slice(0, MAX_DISCORD_ITEMS);
+  const suffix = totalCount > MAX_DISCORD_ITEMS ? `\n\n_...and ${totalCount - MAX_DISCORD_ITEMS} more added to Raindrop.io_` : "";
   const message =
     "📰 **New RSS items added to Raindrop.io!**\n\n" +
-    newItems
-      .slice(0, 10)
-      .map((i) => `• [${i.title}](${i.link})`)
-      .join("\n");
+    displayItems.map((i) => `• [${i.title}](${i.link})`).join("\n") +
+    suffix;
 
   const payload = { content: message };
 
@@ -111,6 +117,10 @@ async function processFeed(url) {
   );
 
   for (const item of recentItems) {
+    if (!item.link || !item.title) {
+      console.warn(`⚠️ Skipping item with missing title or link.`);
+      continue;
+    }
     try {
       await addToRaindrop(item);
       item.feedTitle = feed.title || "RSS Feed";

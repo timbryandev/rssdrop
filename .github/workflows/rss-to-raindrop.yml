@@ -1,11 +1,8 @@
 name: RSS to Raindrop
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */6 * * *" # change the 6 to match your value for HOURS_BACK
   workflow_dispatch:
-  push:
-    branches:
-      - production
 
 jobs:
   sync:
@@ -25,4 +22,4 @@ jobs:
           RAINDROP_TOKEN: ${{ secrets.RAINDROP_TOKEN }}
           RAINDROP_COLLECTION_ID: ${{ secrets.RAINDROP_COLLECTION_ID }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          HOURS_BACK: ${{ secrets.HOURS_BACK }}
+          HOURS_BACK: ${{ vars.HOURS_BACK }}
