@@ -7,9 +7,6 @@ Runs hands‑free on a [GitHub Actions](https://docs.github.com/en/actions)
 schedule – no servers, no state, no fuss.
 
 
-Built with Node.js, TypeScript sensibilities, and caffeine. ☕
-
-
 ---
 
 ## 🚀 Features
@@ -38,8 +35,8 @@ Built with Node.js, TypeScript sensibilities, and caffeine. ☕
 ### 1. Clone & install dependencies
 
 ```bash
-git clone https://github.com/yourname/rss-to-raindrop.git
-cd rss-to-raindrop
+git clone https://github.com/timbryandev/rssdrop.git
+cd rssdrop
 npm install
 ```
 
@@ -54,16 +51,23 @@ export const RSS_FEEDS = [
 ];
 ```
 
-### 3. Create GitHub secrets
+### 3. Configure GitHub secrets and variables
 
-In your repository → **Settings → Secrets and variables → Actions → New secret**
+In your repository → **Settings → Secrets and variables → Actions**
 
-| Variable | Default | Purpose |
-|-----------|----------|----------|
-| `HOURS_BACK` | 6 | How far back to look for new posts |
+**Secrets** (Settings → Secrets and variables → Actions → Secrets):
+
+| Secret | Default | Purpose |
+|--------|---------|---------|
 | `RAINDROP_COLLECTION_ID` | — | The Raindrop collection ID to use |
 | `RAINDROP_TOKEN` | — | Your Raindrop.io API token from [Raindrop Integrations](https://app.raindrop.io/settings/integrations) |
 | `DISCORD_WEBHOOK` | — | Discord webhook URL from your target channel |
+
+**Variables** (Settings → Secrets and variables → Actions → Variables):
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `HOURS_BACK` | 6 | How far back to look for new posts |
 
 ### 4. Configure workflow
 
@@ -82,7 +86,7 @@ The default workflow runs every 6 hours and uses Node 24:
 name: RSS to Raindrop
 on:
   schedule:
-    - cron: "0 */6 * * *" # chage the 6 match your value for HOURS_BACK
+    - cron: "0 */6 * * *" # change the 6 to match your value for HOURS_BACK
   workflow_dispatch:
 ```
 
